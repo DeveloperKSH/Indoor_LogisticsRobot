@@ -61,19 +61,19 @@
 ```mermaid
 flowchart LR
   subgraph Sensors
-    L["LiDAR 180°"] -->|/scan| F1["LiDAR Range Filter"]
-    I["IMU"] --> E["robot_localization / EKF"]
+    L["LiDAR"] -->|/scan| F1["LiDAR Filter"]
+    I["IMU"] --> E["EKF"]
     O["Wheel Odom"] --> E
   end
 
   F1 -->|/filtered_scan| S["SLAM / AMCL"]
-  E -->|TF (map→odom→base_link)| S
-  S -->|pose/map| N["Nav2 (zeta_navigation2)"]
+  E -->|TF map-odom-base_link| S
+  S -->|pose/map| N["Nav2"]
   N -->|cmd_vel| M["Motor Driver"]
 
   subgraph Orchestration
-    P["PM2 Scripts"] --> B["Bringup / SLAM / Nav2"]
-    W["FSM Waypoint"] --> N
+    P["PM2"] --> B["Bringup / SLAM / Nav2"]
+    W["FSM"] --> N
     N -->|feedback/result| W
   end
 ```
