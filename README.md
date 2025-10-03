@@ -1,6 +1,6 @@
-# z8015odroid — Indoor Logistics Robot Stack (180° LiDAR & ROS 2)
+# Indoor Logistics Robot Stack (180° LiDAR & ROS2)
 
-저비용 실내 물류로봇을 위해 **전방 180° 단일 LiDAR**와 **실내 맵 기반 자율주행**을 구현한 ROS 2 스택입니다. 센서 세팅·동기화부터 SLAM/Localization/Nav2/FSM, Docker/PM2 운영까지 실전 운용 흐름을 그대로 담았습니다.
+저비용 실내 물류로봇을 위해 **전방 180° 단일 LiDAR**와 **실내 맵 기반 자율주행**을 구현한 ROS2 스택입니다. 센서 세팅·동기화부터 SLAM/Localization/Nav2/FSM, Docker/PM2 운영까지 실전 운용 흐름을 그대로 담았습니다.
 
 - **역할**: 180° FOV LiDAR, IMU, Wheel Odom을 **필터링·융합**하여 안정적인 **맵 생성/로컬라이제이션/자율주행** 수행  
 - **구성**: `z8015`(모터 드라이버·센서·브링업), Cartographer/SLAM Toolbox, AMCL, robot_localization(EKF), Nav2(zeta_navigation2), FSM Waypoint, udev rules, Docker/PM2  
