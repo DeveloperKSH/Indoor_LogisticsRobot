@@ -1,8 +1,10 @@
 # Indoor Logistics Robot Stack (180° LiDAR & ROS2)
 
-저비용 실내 물류로봇을 위해 **전방 180° 단일 LiDAR**와 **실내 맵 기반 자율주행**을 구현한 ROS 2 스택입니다.  
-**모터 드라이버 기반 구동부 제어**와 **LiDAR/IMU 등 센서 파이프라인**을 한 레이어(`z8015`)에서 통합해, SLAM/Localization/Nav2/FSM 위로 **일관된 토픽/TF**를 공급합니다.  
-운영은 **Docker 컨테이너**와 **PM2 프로세스 감시**를 통해 현장 재시작/헬스체크/로그 수집을 자동화했습니다.
+저비용 실내 물류로봇을 위해 **전방 180° 단일 LiDAR**와 **실내 맵 기반 자율주행**을 구현한 ROS2 스택입니다.  
+
+**모터 드라이버 기반 구동부 제어**와 **LiDAR/IMU 등 센서 파이프라인**을 한 레이어에서 통합해, 상위 스택에 **일관된 토픽/TF**를 공급합니다.  
+
+운영은 **Docker 컨테이너**와 **PM2 프로세스 감시**를 통해 현장 재시작, 헬스체크, 로그 수집을 자동화했습니다.
 
 - **역할**: 180° FOV LiDAR, IMU, Wheel Odom을 **필터링·융합**하여 안정적인 **맵 생성/로컬라이제이션/자율주행** 수행  
 - **구성**: `z8015`(모터 드라이버·센서·브링업), Cartographer/SLAM Toolbox, AMCL, robot_localization(EKF), Nav2(zeta_navigation2), FSM Waypoint, udev rules, Docker/PM2  
