@@ -6,7 +6,7 @@
 
 운영은 **Docker 컨테이너**와 **PM2 프로세스 감시**를 통해 현장 재시작, 헬스체크, 로그 수집을 자동화했습니다.
 
-- **역할**: 180° FOV LiDAR, IMU, Wheel Odom을 **필터링·융합**하여 안정적인 **맵 생성/로컬라이제이션/자율주행** 수행  
+- **역할**: LiDAR **필터링** 및 Odom, IMU를 **융합**하여 안정적인 **맵 생성 → 로컬라이제이션 → 자율주행** 수행  
 - **구성**: `z8015`(모터 드라이버·센서·브링업), Cartographer/SLAM Toolbox, AMCL, robot_localization(EKF), Nav2(zeta_navigation2), FSM Waypoint, udev rules, Docker/PM2  
 - **활용**: 창고/사무동/학교 등 **실내 물류로봇**(저가형 하드웨어) 현장 투입 및 빠른 재현/확장
 
