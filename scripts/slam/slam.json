@@ -1,0 +1,15 @@
+{
+  "apps": [
+    {
+      "name": "cartographer",
+      "cwd": "/root/scripts/slam",
+      "args": "",
+      "script": "cartographer.sh",
+      "exec_mode": "fork",
+      "exec_interpreter": "bash",
+      "log_file": "/dev/null",
+      "out_file": "/dev/null",
+      "error_file": "/dev/null"
+    }
+  ]
+}

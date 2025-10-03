@@ -1,0 +1,438 @@
+# GPS WPF CHANGES: 
+# - amcl params where removed. They are not needed because global localization is provided
+#   by an ekf node on robot_localization fusing gps data with local odometry sources
+# - static layer is removed from both costmaps, in this tutorial we assume there is no map
+#   of the environment
+# - global costmap is set to be rolling to allow the robot to traverse big environment by
+#   following successive relatively close waypoints that fit in a smaller rolling costmap
+
+bt_navigator:
+  ros__parameters:
+    global_frame: map
+    robot_base_frame: base_link
+    odom_topic: /odometry
+    bt_loop_duration: 20
+    default_server_timeout: 20
+    navigators: ["navigate_to_pose", "navigate_through_poses"]
+    navigate_to_pose:
+      plugin: "nav2_bt_navigator/NavigateToPoseNavigator"
+    navigate_through_poses:
+      plugin: "nav2_bt_navigator/NavigateThroughPosesNavigator"
+    # 'default_nav_through_poses_bt_xml' and 'default_nav_to_pose_bt_xml' are use defaults:
+    # nav2_bt_navigator/navigate_to_pose_w_replanning_and_recovery.xml
+    # nav2_bt_navigator/navigate_through_poses_w_replanning_and_recovery.xml
+    # They can be set here or via a RewrittenYaml remap from a parent launch file to Nav2.
+    default_nav_to_pose_bt_xml: "/home/bcc/zeta_ws/src/zeta_navigation2/behavior_trees/navigate_to_pose_w_replanning_and_recovery.xml"
+    default_nav_through_poses_bt_xml: "/home/bcc/zeta_ws/src/zeta_navigation2/behavior_trees/navigate_through_poses_w_replanning_and_recovery.xml"
+
+    plugin_lib_names:
+      - nav2_compute_path_to_pose_action_bt_node
+      - nav2_compute_path_through_poses_action_bt_node
+      - nav2_smooth_path_action_bt_node
+      - nav2_follow_path_action_bt_node
+      - nav2_spin_action_bt_node
+      - nav2_wait_action_bt_node
+      - nav2_assisted_teleop_action_bt_node
+      - nav2_back_up_action_bt_node
+      - nav2_drive_on_heading_bt_node
+      - nav2_clear_costmap_service_bt_node
+      - nav2_is_stuck_condition_bt_node
+      - nav2_goal_reached_condition_bt_node
+      - nav2_goal_updated_condition_bt_node
+      - nav2_globally_updated_goal_condition_bt_node
+      - nav2_is_path_valid_condition_bt_node
+      - nav2_are_error_codes_active_condition_bt_node
+      - nav2_would_a_controller_recovery_help_condition_bt_node
+      - nav2_would_a_planner_recovery_help_condition_bt_node
+      - nav2_would_a_smoother_recovery_help_condition_bt_node
+      - nav2_initial_pose_received_condition_bt_node
+      - nav2_reinitialize_global_localization_service_bt_node
+      - nav2_rate_controller_bt_node
+      - nav2_distance_controller_bt_node
+      - nav2_speed_controller_bt_node
+      - nav2_truncate_path_action_bt_node
+      - nav2_truncate_path_local_action_bt_node
+      - nav2_goal_updater_node_bt_node
+      - nav2_recovery_node_bt_node
+      - nav2_pipeline_sequence_bt_node
+      - nav2_round_robin_node_bt_node
+      - nav2_transform_available_condition_bt_node
+      - nav2_time_expired_condition_bt_node
+      - nav2_path_expiring_timer_condition
+      - nav2_distance_traveled_condition_bt_node
+      - nav2_single_trigger_bt_node
+      - nav2_goal_updated_controller_bt_node
+      - nav2_is_battery_low_condition_bt_node
+      - nav2_navigate_through_poses_action_bt_node
+      - nav2_navigate_to_pose_action_bt_node
+      - nav2_remove_passed_goals_action_bt_node
+      - nav2_planner_selector_bt_node
+      - nav2_controller_selector_bt_node
+      - nav2_goal_checker_selector_bt_node
+      - nav2_controller_cancel_bt_node
+      - nav2_path_longer_on_approach_bt_node
+      - nav2_wait_cancel_bt_node
+      - nav2_spin_cancel_bt_node
+      - nav2_back_up_cancel_bt_node
+      - nav2_assisted_teleop_cancel_bt_node
+      - nav2_drive_on_heading_cancel_bt_node
+      - nav2_is_battery_charging_condition_bt_node
+    error_code_names:
+      - compute_path_error_code
+      - follow_path_error_code
+
+#bt_navigator_navigate_through_poses_rclcpp_node:
+#  ros__parameters:
+#    use_sim_time: False
+#
+#bt_navigator_navigate_to_pose_rclcpp_node:
+#  ros__parameters:
+#    use_sim_time: False
+
+controller_server:
+  ros__parameters:
+    use_sim_time: False
+    controller_frequency: 10.0
+    min_x_velocity_threshold: 0.001
+    min_y_velocity_threshold: 0.0
+    min_theta_velocity_threshold: 0.001
+    failure_tolerance: -1.0
+    progress_checker_plugins: ["progress_checker"]
+    goal_checker_plugins: ["general_goal_checker"] # "precise_goal_checker"
+    controller_plugins: ["FollowPath_DWB", "FollowPath_RPP", "FollowPath_VP"]
+
+    # Progress checker parameters
+    progress_checker:
+      plugin: "nav2_controller::SimpleProgressChecker"
+      required_movement_radius: 0.7
+      movement_time_allowance: 10.0
+    # Goal checker parameters
+    #precise_goal_checker:
+    #  plugin: "nav2_controller::SimpleGoalChecker"
+    #  xy_goal_tolerance: 0.25
+    #  yaw_goal_tolerance: 0.25
+    #  stateful: True
+    general_goal_checker:
+      stateful: True
+      plugin: "nav2_controller::SimpleGoalChecker"
+      xy_goal_tolerance: 0.30
+      yaw_goal_tolerance: 0.261799 # 0.261799 -> 0.174533
+    # DWB parameters
+    FollowPath_DWB:
+      plugin: "nav2_rotation_shim_controller::RotationShimController"
+      primary_controller: "dwb_core::DWBLocalPlanner"
+      angular_dist_threshold: 0.436332 # 0.436332 -> 0.35 -> 0.27 -> 0.20944 -> 0.436332(24) -> 0.785398(50)
+      forward_sampling_distance: 0.5 # 0.7 -> 1.7 -> 0.25
+      rotate_to_heading_angular_vel: 1.0 # 1.8 -> 1.1 -> 0.5 -> 0.2
+      max_angular_accel: 0.8  # 3.2 -> 1.2 -> 1.0 -> 3.2 -> 0.2
+      simulate_ahead_time: 1.0  # 1.0 -> 2.0
+      # plugin: "dwb_core::DWBLocalPlanner"
+      debug_trajectory_details: False
+      min_vel_x: 0.0
+      min_vel_y: 0.0
+      max_vel_x: 1.0  # 0.5 -> 1.5 -> 0.7-> 0.8 -> 1.0
+      max_vel_y: 0.0
+      max_vel_theta: 1.0 # 0.6 -> 0.3 -> 0.15 main theta velocity control
+      min_speed_xy: 0.0
+      max_speed_xy: 1.0  # 0.7 -> 1.0 -> 0.7 -> 0.8 -> 1.0
+      min_speed_theta: 0.0
+      # Add high threshold velocity for turtlebot 3 issue.
+      # https://github.com/ROBOTIS-GIT/turtlebot3_simulations/issues/75
+      acc_lim_x: 2.5
+      acc_lim_y: 0.0
+      acc_lim_theta: 1.2  # 3.2 -> 1.2 -> 0.2
+      decel_lim_x: -1.5
+      decel_lim_y: 0.0
+      decel_lim_theta: -0.8  # -3.2 -> -1.2 -> -0.2
+      vx_samples: 30
+      vy_samples: 5
+      vtheta_samples: 20
+      sim_time: 1.7
+      linear_granularity: 0.05
+      angular_granularity: 0.025
+      transform_tolerance: 0.3
+      xy_goal_tolerance: 0.25
+      trans_stopped_velocity: 0.25
+      short_circuit_trajectory_evaluation: True
+      stateful: True
+      critics: [ "RotateToGoal", "Oscillation", "BaseObstacle", "GoalAlign", "PathAlign", "PathDist", "GoalDist" ]
+      BaseObstacle.scale: 0.05
+      PathAlign.scale: 40.0
+      PathAlign.forward_point_distance: 0.1
+      GoalAlign.scale: 30.0
+      GoalAlign.forward_point_distance: 0.1
+      PathDist.scale: 32.0
+      GoalDist.scale: 24.0
+      RotateToGoal.scale: 32.0
+      RotateToGoal.slowing_factor: 5.0
+      RotateToGoal.lookahead_time: -1.0
+
+    FollowPath_RPP:
+      # plugin: "nav2_rotation_shim_controller::RotationShimController"
+     # primary_controller: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
+      plugin: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
+      angular_dist_threshold: 0.3
+      forward_sampling_distance: 0.7
+      rotate_to_heading_angular_vel: 1.8
+      max_angular_accel: 1.5
+      simulate_ahead_time: 1.2
+      desired_linear_vel: 0.8
+      lookahead_dist: 1.0   # 값이 작으면 Wiggling 발생, > 0.9: detected collision ahead!
+      min_lookahead_dist: 0.3
+      max_lookahead_dist: 1.5 # 기존 1.7 → 2.0 (경로를 더 넓게 탐색)
+      lookahead_time: 2.0
+      transform_tolerance: 0.2   # 기존 1.5 → 1.0 (너무 높으면 불필요한 변동 발생)
+      use_velocity_scaled_lookahead_dist: false  # true: linear.x * lookahead_time
+      min_approach_linear_velocity: 0.1
+      approach_velocity_scaling_dist: 1.7  # 기존 1.5 → 1.7 (더 부드러운 감속)
+      use_collision_detection: true
+      max_allowed_time_to_collision_up_to_carrot: 3.0  # 기존 3.0 → 2.5 (더 빠른 멈춤 반응)
+      use_regulated_linear_velocity_scaling: true
+      use_cost_regulated_linear_velocity_scaling: true # 넓은 공간 (야외, 대형 공간)
+      regulated_linear_scaling_min_radius: 1.2  # 기존 1.2 → 1.5 (직진성 강화)
+      regulated_linear_scaling_min_speed: 0.2   # 기존 0.15 → 0.2 (너무 느려지지 않도록 조정)
+      use_fixed_curvature_lookahead: false  # 기존 true → false (더 유연한 주행 가능)
+      curvature_lookahead_dist: 1.0
+      use_rotate_to_heading: true
+      rotate_to_heading_min_angle: 0.35   # 기존 0.5 → 0.4 (더 부드러운 회전)
+      max_robot_pose_search_dist: 10.0
+      interpolate_curvature_after_goal: false
+      cost_scaling_dist: 1.0
+      cost_scaling_gain: 0.8
+      inflation_cost_scaling_factor: 3.0 # == cost_scaling_factor
+
+    FollowPath_VP:
+      plugin: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
+      desired_linear_vel: 0.7
+      lookahead_dist: 0.9 # 0.6
+      min_lookahead_dist: 0.3
+      max_lookahead_dist: 0.9
+      lookahead_time: 1.5
+      rotate_to_heading_angular_vel: 2.0 # 1.0 # 0.5 #1.8
+      transform_tolerance: 0.2 # 0.1
+      use_velocity_scaled_lookahead_dist: false
+      min_approach_linear_velocity: 0.05
+      approach_velocity_scaling_dist: 1.8 # 0.6
+      use_collision_detection: true
+      max_allowed_time_to_collision_up_to_carrot: 1.0
+      use_regulated_linear_velocity_scaling: true
+      use_fixed_curvature_lookahead: false
+      curvature_lookahead_dist: 0.6 # 0.25
+      use_cost_regulated_linear_velocity_scaling: false
+      regulated_linear_scaling_min_radius: 0.9 # 0.1 # 0.9
+      regulated_linear_scaling_min_speed: 0.25
+      use_rotate_to_heading: true
+      allow_reversing: false
+      rotate_to_heading_min_angle: 0.3 # 0.785
+      max_angular_accel: 3.0 #1.5 # 0.5 #3.2
+      max_robot_pose_search_dist: 2.0 # 10.0
+
+# GPS WPF CHANGE: Remove static layer
+local_costmap:
+  local_costmap:
+    ros__parameters:
+      update_frequency: 5.0
+      publish_frequency: 2.0
+      global_frame: odom
+      robot_base_frame: base_link
+      use_sim_time: False
+      rolling_window: True
+      width: 3
+      height: 3
+      resolution: 0.05
+      robot_radius: 0.26  # 0.30 -> 0.26
+      plugins: ["obstacle_layer", "inflation_layer"]
+      inflation_layer:
+        plugin: "nav2_costmap_2d::InflationLayer"
+        cost_scaling_factor: 3.0
+        inflation_radius: 0.32  # inflation_radius ≥ 로봇의 반경 + 안전 마진
+      obstacle_layer:
+        plugin: "nav2_costmap_2d::ObstacleLayer"
+        enabled: True
+        observation_sources: scan
+        combination_method: 1
+        scan:
+          topic: /filtered_scan
+          max_obstacle_height: 1.5
+          clearing: True
+          marking: True
+          data_type: "LaserScan"
+          raytrace_max_range: 3.0
+          raytrace_min_range: 0.1
+          obstacle_max_range: 3.5
+          obstacle_min_range: 0.1
+      voxel_layer:
+        plugin: "nav2_costmap_2d::VoxelLayer"
+        enabled: True
+        publish_voxel_map: True
+        origin_z: 0.0
+        z_resolution: 0.05
+        z_voxels: 16
+        max_obstacle_height: 2.0
+        mark_threshold: 0
+        observation_sources: scan
+        scan:
+          topic: /filtered_scan
+          max_obstacle_height: 2.0
+          clearing: True
+          marking: True
+          data_type: "LaserScan"
+          raytrace_max_range: 3.0
+          raytrace_min_range: 0.0
+          obstacle_max_range: 2.5
+          obstacle_min_range: 0.0
+
+      always_send_full_costmap: True
+      static_layer:
+        plugin: "nav2_costmap_2d::StaticLayer"
+        map_subscribe_transient_local: True
+
+# GPS WPF CHANGE: Remove static layer
+# GPS WPF CHANGE: Set rolling global costmap with 50x50 size. See note below
+global_costmap:
+  global_costmap:
+    ros__parameters:
+      update_frequency: 5.0  # 4.0 -> 5.0 gray: 2.0 -> 5.0
+      publish_frequency: 2.0 # gray: 1.0 -> 2.0
+      global_frame: map
+      robot_base_frame: base_link
+      use_sim_time: False
+      robot_radius: 0.26
+      resolution: 0.03
+      # When using GPS navigation you will potentially traverse huge environments which are not practical to
+      # fit on a big static costmap. Thus it is recommended to use a rolling global costmap large enough to 
+      # contain each pair of successive waypoints. See: https://github.com/ros-planning/navigation2/issues/2174
+      rolling_window: True
+      width: 50
+      height: 50
+      track_unknown_space: True
+      # no static map
+      plugins: ["inflation_layer"]
+      obstacle_layer:
+        plugin: "nav2_costmap_2d::ObstacleLayer"
+        enabled: True
+        observation_sources: scan
+        scan:
+          topic: /filtered_scan
+          max_obstacle_height: 2.0
+          clearing: True
+          marking: True
+          data_type: "LaserScan"
+          raytrace_max_range: 3.0
+          raytrace_min_range: 0.0
+          obstacle_max_range: 2.5
+          obstacle_min_range: 0.0
+          # outdoors there will probably be more inf points
+          inf_is_valid: true
+      inflation_layer:
+        plugin: "nav2_costmap_2d::InflationLayer"
+        cost_scaling_factor: 2.0
+        inflation_radius: 0.6 # 0.28 -> 0.5, gray: 0.28 -> 0.5
+      always_send_full_costmap: True
+      static_layer:
+        plugin: "nav2_costmap_2d::StaticLayer"
+        map_subscribe_transient_local: True
+      clear_goal_layer:
+        plugin: "nav2_clear_goal_plugin/ClearGoal"
+        enabled: True
+        goal_x: 10000.0
+        goal_y: 10000.0
+        radius: 1.0
+
+# The yaml_filename does not need to be specified since it going to be set by defaults in launch.
+# If you'd rather set it in the yaml, remove the default "map" value in the tb3_simulation_launch.py
+# file & provide full path to map below. If CLI map configuration or launch default is provided, that will be used.
+# map_server:
+#   ros__parameters:
+#     yaml_filename: ""
+
+map_saver:
+  ros__parameters:
+    use_sim_time: False
+    save_map_timeout: 5.0
+    free_thresh_default: 0.25
+    occupied_thresh_default: 0.65
+    map_subscribe_transient_local: True
+
+planner_server:
+  ros__parameters:
+    expected_planner_frequency: 20.0
+    planner_plugins: ["NavfnPlanner"]   # ["NavfnPlanner", "StraightLine"]
+    # NavFn Planner
+    NavfnPlanner:
+      plugin: "nav2_navfn_planner/NavfnPlanner"
+      tolerance: 1.0
+      use_astar: True
+
+    # Straight Line Planner
+    # StraightLine:
+    #   plugin: "nav2_straightline_planner/StraightLine"
+    #   tolerance: 1.0
+    #   interpolation_resolution: 0.1
+
+smoother_server:
+  ros__parameters:
+    use_sim_time: False
+    smoother_plugins: ["simple_smoother"]
+    simple_smoother:
+      plugin: "nav2_smoother::SimpleSmoother"
+      tolerance: 1.0e-10
+      max_its: 1000
+      do_refinement: True
+
+behavior_server:
+  ros__parameters:
+    local_costmap_topic: local_costmap/costmap_raw
+    global_costmap_topic: global_costmap/costmap_raw
+    local_footprint_topic: local_costmap/published_footprint
+    global_footprint_topic: global_costmap/published_footprint
+    cycle_frequency: 10.0
+#    behavior_plugins: ["spin", "backup", "drive_on_heading", "assisted_teleop", "wait"]
+#    spin:
+#      plugin: "nav2_behaviors/Spin"
+#    backup:
+#      plugin: "nav2_behaviors/BackUp"
+#    drive_on_heading:
+#      plugin: "nav2_behaviors/DriveOnHeading"
+#    wait:
+#      plugin: "nav2_behaviors/Wait"
+#    assisted_teleop:
+#      plugin: "nav2_behaviors/AssistedTeleop"
+    local_frame: odom
+    global_frame: map
+    robot_base_frame: base_link
+    transform_tolerance: 0.1
+    simulate_ahead_time: 2.0
+    max_rotational_vel: 1.0
+    min_rotational_vel: 0.4
+    rotational_acc_lim: 3.2
+
+#robot_state_publisher:
+#  ros__parameters:
+#    use_sim_time: False
+
+waypoint_follower:
+  ros__parameters:
+    use_sim_time: False
+    loop_rate: 20
+    stop_on_failure: False
+    waypoint_task_executor_plugin: "wait_at_waypoint"
+    wait_at_waypoint:
+      plugin: "nav2_waypoint_follower::WaitAtWaypoint"
+      enabled: False
+      waypoint_pause_duration: 0
+
+velocity_smoother:
+  ros__parameters:
+    use_sim_time: False
+    smoothing_frequency: 10.0
+    scale_velocities: False
+    feedback: "OPEN_LOOP"
+    max_velocity: [1.0, 0.0, 1.0]    # 0.5(x) -> 1.5, 0.2(z) -> 1.2 -> 0.2, 0.5(x) -> 1.0
+    min_velocity: [-1.0, 0.0, -1.0]
+    max_accel: [0.8, 0.0, 1.2]  # 3.2(z) -> 0.2 -> 1.2 -> 0.2
+    max_decel: [-0.8, 0.0, -1.2]
+    odom_topic: "odometry"
+    odom_duration: 0.1
+    deadband_velocity: [0.08, 0.0, 0.0]
+    velocity_timeout: 1.0

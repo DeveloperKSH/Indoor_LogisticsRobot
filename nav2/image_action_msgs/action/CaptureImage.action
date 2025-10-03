@@ -1,0 +1,12 @@
+# Goal
+string device
+int32 width
+int32 height
+string robot_id
+string direction
+---
+# Result
+string upload_url
+---
+# Feedback
+string feedback

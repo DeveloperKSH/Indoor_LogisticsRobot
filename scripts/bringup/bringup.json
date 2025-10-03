@@ -1,0 +1,103 @@
+{
+  "apps": [
+    {
+      "name": "odometry",
+      "cwd": "/root/scripts/bringup",
+      "args": "",
+      "script": "odometry.sh",
+      "exec_mode": "fork",
+      "exec_interpreter": "bash",
+      "log_file": "/dev/null",
+      "out_file": "/dev/null",
+      "error_file": "/dev/null"
+    },
+    {
+      "name": "uron",
+      "cwd": "/root/scripts/bringup",
+      "args": "",
+      "script": "uron.sh",
+      "exec_mode": "fork",
+      "exec_interpreter": "bash",
+      "log_file": "/dev/null",
+      "out_file": "/dev/null",
+      "error_file": "/dev/null"
+    },
+    {
+      "name": "imu",
+      "cwd": "/root/scripts/bringup",
+      "args": "",
+      "script": "imu.sh",
+      "exec_mode": "fork",
+      "exec_interpreter": "bash",
+      "log_file": "/dev/null",
+      "out_file": "/dev/null",
+      "error_file": "/dev/null"
+    },
+    {
+      "name": "imu_restart",
+      "cwd": "/root/scripts/bringup",
+      "args": "",
+      "script": "imu_restart.sh",
+      "exec_mode": "fork",
+      "exec_interpreter": "bash",
+      "log_file": "/dev/null",
+      "out_file": "/dev/null",
+      "error_file": "/dev/null"
+    },
+    {
+      "name": "sonar",
+      "cwd": "/root/scripts/bringup",
+      "args": "",
+      "script": "sonar.sh",
+      "exec_mode": "fork",
+      "exec_interpreter": "bash",
+      "log_file": "/dev/null",
+      "out_file": "/dev/null",
+      "error_file": "/dev/null"
+    },
+    {
+      "name": "efk",
+      "cwd": "/root/scripts/bringup",
+      "args": "",
+      "script": "single_ekf_navsat.sh",
+      "exec_mode": "fork",
+      "exec_interpreter": "bash",
+      "log_file": "/dev/null",
+      "out_file": "/dev/null",
+      "error_file": "/dev/null"
+    },
+    {
+      "name": "tf",
+      "cwd": "/root/scripts/bringup",
+      "args": "",
+      "script": "tf.sh",
+      "exec_mode": "fork",
+      "exec_interpreter": "bash",
+      "log_file": "/dev/null",
+      "out_file": "/dev/null",
+      "error_file": "/dev/null"
+    },
+    {
+      "name": "lidar",
+      "cwd": "/root/scripts/bringup",
+      "args": "",
+      "script": "lidar.sh",
+      "exec_mode": "fork",
+      "exec_interpreter": "bash",
+      "log_file": "/dev/null",
+      "out_file": "/dev/null",
+      "error_file": "/dev/null"
+    },
+    {
+      "name": "lidar_filter",
+      "cwd": "/root/scripts/bringup",
+      "args": "",
+      "script": "lidar_filter.sh",
+      "exec_mode": "fork",
+      "exec_interpreter": "bash",
+      "log_file": "/dev/null",
+      "out_file": "/dev/null",
+      "error_file": "/dev/null"
+    }
+  ]
+}

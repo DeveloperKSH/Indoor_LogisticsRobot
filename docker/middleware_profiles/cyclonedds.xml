@@ -1,0 +1,11 @@
+<CycloneDDS>
+  <Domain id="19">
+    <Discovery>
+      <Peers>
+        <Peer address="192.168.11.6"/>
+        <Peer address="192.168.11.9"/>
+      </Peers>
+      <MaxAutoParticipantIndex>64</MaxAutoParticipantIndex>
+    </Discovery>
+  </Domain>
+</CycloneDDS>

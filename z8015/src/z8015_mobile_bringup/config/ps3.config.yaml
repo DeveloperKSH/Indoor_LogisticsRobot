@@ -1,0 +1,24 @@
+# Ref: https://github.com/ros2/teleop_twist_joy
+teleop_twist_joy_node:
+  ros__parameters:
+    axis_linear:
+      x: 1 # L stick
+    scale_linear:
+      x: 0.7   # linear velocity
+    scale_linear_turbo:
+      x: 0.7   # linear velocity
+
+    axis_angular:
+      yaw: 3 # R stick
+    scale_angular:
+      yaw: 0.5  # angular velocity
+    scale_angular_turbo:
+      yaw: 0.5  # angular velocity
+
+    enable_button: 5  # L1
+    enable_turbo_button: 4 # L2
+
+# file 변경후
+# ps -aux | grep teleop_twist_joy
+# kill -9 <pid>
+# ros2 run teleop_twist_joy teleop_node --ros-args --params-file ./install/a012_mobile_bringup/share/a012_mobile_bringup/config/ps3.config.yaml --remap cmd_vel:=/teleop_node/cmd_vel

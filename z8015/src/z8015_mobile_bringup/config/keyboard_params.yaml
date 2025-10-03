@@ -1,0 +1,5 @@
+# params.yaml
+teleop_twist_keyboard_node:
+  ros__parameters:
+    speed: 0.2
+    turn: 0.2

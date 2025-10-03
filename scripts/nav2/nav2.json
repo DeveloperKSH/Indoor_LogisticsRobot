@@ -1,0 +1,12 @@
+{
+    "apps": [
+        {
+            "name": "zeta_navigation2",
+            "cwd": "/root/scripts/nav2",
+            "args": "",
+            "script": "zeta_navigation2.sh",
+            "exec_mode": "fork",
+            "exec_interpreter": "bash"
+        }
+    ]
+}

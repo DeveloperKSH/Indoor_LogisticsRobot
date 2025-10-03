@@ -1,0 +1,53 @@
+FROM ubuntu:22.04
+
+ARG DEBIAN_FRONTEND=noninteractive
+SHELL ["/bin/bash", "-c"]
+
+# 1️⃣ 필수 도구 설치
+RUN apt-get update && apt-get install -y \
+    curl gnupg2 lsb-release locales \
+    && locale-gen en_US en_US.UTF-8 && update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+
+ENV LANG=en_US.UTF-8
+ENV LC_ALL=en_US.UTF-8
+
+# 2️⃣ ROS 2 Jazzy GPG 키 등록 및 sources.list 추가
+RUN curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.key \
+  | gpg --dearmor -o /usr/share/keyrings/ros-archive-keyring.gpg && \
+  echo "deb [signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" \
+  > /etc/apt/sources.list.d/ros2.list
+
+# 3️⃣ ROS 2 + colcon 설치
+RUN apt-get update && apt-get install -y \
+    ros-iron-ros-base \
+    python3-colcon-common-extensions \
+    python3-rosdep \
+    git build-essential cmake \
+    && rm -rf /var/lib/apt/lists/*
+
+# 4️⃣ rosdep 초기화
+RUN rosdep init && rosdep update
+
+# 5️⃣ 환경 설정
+ENV ROS_DISTRO=iron
+RUN echo "source /opt/ros/$ROS_DISTRO/setup.bash" >> ~/.bashrc
+# 다시 bash shell로 고정
+SHELL ["/bin/bash", "-c"]
+
+# 6️⃣ nodejs/pm2 등 유틸리티 설치
+RUN apt-get update && \
+    apt-get remove -y nodejs libnode-dev npm || true && apt-get autoremove -y && \
+    curl -sL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs xterm htop vim && \
+    npm install -g pm2 && \
+    pm2 install pm2-logrotate && \
+    pm2 set pm2-logrotate:max_size 1K && \
+    rm -rf /var/lib/apt/lists/*
+
+
+# 7️⃣ 미들웨어 프로파일 복사
+RUN mkdir -p /usr/local/share/middleware_profiles
+COPY middleware_profiles/*profile.xml /usr/local/share/middleware_profiles
+
+# 9️⃣ 기본 셸
+CMD ["bash"]

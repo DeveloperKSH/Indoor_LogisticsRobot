@@ -1,0 +1,102 @@
+FROM z8015odroid-jazzy
+ARG DEBIAN_FRONTEND=noninteractive
+SHELL ["/bin/bash", "-c"]
+
+# 모든 패키지를 한 번에 설치
+RUN apt-get update && apt-get install -y \
+    # Navigation 패키지들
+    ros-$ROS_DISTRO-nav2-bringup \
+    ros-$ROS_DISTRO-navigation2 \
+    ros-$ROS_DISTRO-robot-localization \
+    ros-$ROS_DISTRO-joy \
+    ros-$ROS_DISTRO-teleop-twist-joy \
+    ros-$ROS_DISTRO-joint-state-publisher \
+    ros-$ROS_DISTRO-rviz2 \
+    ros-$ROS_DISTRO-xacro \
+    ros-$ROS_DISTRO-twist-mux \
+    ros-$ROS_DISTRO-interactive-marker-twist-server \
+    ros-$ROS_DISTRO-rqt \
+    ros-$ROS_DISTRO-rqt-graph \
+    ros-$ROS_DISTRO-teleop-twist-keyboard \
+    ros-$ROS_DISTRO-tf-transformations \
+    # 기본 도구들
+    python3-pip \
+    iputils-ping \
+    git \
+    # RMF 빌드에 필요한 시스템 패키지들
+    libwebsocketpp-dev \
+    nlohmann-json3-dev \
+    libpython3-dev \
+    pybind11-dev \
+    libeigen3-dev \
+    libfcl-dev \
+    libasio-dev && \
+    # Python 패키지 설치
+    pip install --break-system-packages \
+        requests psutil py_trees pytz geographiclib \
+        supabase fastapi uvicorn websocket-client \
+        flask-socketio pyproj astral && \
+    # 캐시 정리
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /root/ws/src
+COPY zeta_navigation2 zeta_navigation2
+
+## 사용자 패키지 업데이트 및 소스 복사
+WORKDIR /root/ws/src
+RUN git clone https://github.com/open-rmf/rmf_internal_msgs.git -b jazzy
+WORKDIR /root/ws
+RUN source /opt/ros/$ROS_DISTRO/setup.sh && \
+    rosdep install --from-paths src --ignore-src -r -y && \
+    colcon build --packages-select \
+    rmf_fleet_msgs \
+    rmf_charger_msgs \
+    rmf_dispenser_msgs \
+    rmf_task_msgs \
+    rmf_traffic_msgs \
+    rmf_scheduler_msgs \
+    rmf_site_map_msgs \
+    rmf_door_msgs  \
+    rmf_lift_msgs  \
+    rmf_ingestor_msgs
+
+
+# 모든 패키지를 한 번에 설치
+RUN apt-get update && apt-get install -y \
+    ros-$ROS_DISTRO-ament-cmake-vendor-package \
+    python3-jsonschema && \
+    rm -rf /var/lib/apt/lists/*
+
+## build rmf_ros
+WORKDIR /root/ws/src
+# ✅ Clone RMF core dependencies
+RUN git clone https://github.com/open-rmf/rmf_building_map_msgs.git -b jazzy \
+ && git clone https://github.com/open-rmf/rmf_utils.git -b jazzy \
+ && git clone https://github.com/open-rmf/ament_cmake_catch2.git -b jazzy \
+ && git clone https://github.com/open-rmf/nlohmann_json_schema_validator_vendor.git -b jazzy \
+ && git clone https://github.com/open-rmf/rmf_api_msgs.git -b jazzy \
+ && git clone https://github.com/open-rmf/rmf_battery.git -b jazzy \
+ && git clone https://github.com/open-rmf/rmf_task.git -b jazzy \
+ && git clone https://github.com/open-rmf/pybind11_json_vendor.git -b jazzy \
+ && git clone https://github.com/open-rmf/rmf_traffic.git -b jazzy
+
+WORKDIR /root/ws
+RUN source /opt/ros/$ROS_DISTRO/setup.sh && \
+    rosdep install --from-paths src --ignore-src -r -y && \
+    colcon build
+
+WORKDIR /root/ws/src
+RUN git clone https://github.com/open-rmf/rmf_ros2.git -b jazzy
+WORKDIR /root/ws
+RUN source /opt/ros/$ROS_DISTRO/setup.sh && \
+    rosdep install --from-paths src --ignore-src -r -y && \
+    colcon build --packages-select  \
+    rmf_charging_schedule  \
+    rmf_fleet_adapter  \
+    rmf_fleet_adapter_python  \
+    rmf_task_ros2  \
+    rmf_traffic_ros2  \
+    rmf_websocket
+
+# 마지막에 빌드 타임 정보 삽입 (변하지 않게 유지)
+RUN echo "BUILD_TIME=$(date)" > /root/ws/.build_stamp

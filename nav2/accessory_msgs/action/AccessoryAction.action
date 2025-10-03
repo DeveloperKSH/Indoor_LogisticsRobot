@@ -1,0 +1,13 @@
+# Goal
+string robot_id
+string target
+string command
+string color
+
+---
+# Result
+bool success
+
+---
+# Feedback
+string feedback

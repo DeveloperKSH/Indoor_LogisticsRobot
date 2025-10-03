@@ -1,0 +1,81 @@
+services:
+  jazzy:
+    build:
+      context: docker
+      dockerfile: Dockerfile.jazzy
+    tty: true
+
+  bringup:
+    build:
+      context: z8015
+      dockerfile: Dockerfile
+    volumes:
+      - /dev/bus/usb:/dev/bus/usb
+      - /run/udev:/run/udev:ro
+      - /dev:/dev
+      - /dev/input:/dev/input
+      - ./scripts/bringup/:/root/scripts/bringup
+      - ./docker/middleware_profiles:/usr/local/share/middleware_profiles
+      - ./ros_logs:/root/.ros/log/latest:rw
+    command: >
+      bash -c "pm2-runtime /root/scripts/bringup/bringup.json"
+    tty: true
+    privileged: true
+    environment:
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
+      - CYCLONEDDS_URI=/usr/local/share/middleware_profiles/cyclonedds.xml
+    network_mode: host
+    # develop:
+    #   watch:
+    #     - path: ./z8015/src
+    #       action: rebuild
+
+  slam:
+    build:
+      context: slam
+      dockerfile: Dockerfile
+    volumes:
+      - ./scripts/slam:/root/scripts/slam
+      - ./docker/middleware_profiles:/usr/local/share/middleware_profiles
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    command: pm2-runtime /root/scripts/slam/slam.json
+    tty: true
+    environment:
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
+      - DISPLAY=${DISPLAY}
+      - XDG_RUNTIME_DIR=/run/user/$(id -u)
+      - CYCLONEDDS_URI=/usr/local/share/middleware_profiles/cyclonedds.xml
+    privileged: true
+    network_mode: host
+    develop:
+      watch:
+        - path: ./slam
+          action: rebuild
+
+  nav2:
+    build:
+      context: nav2
+      dockerfile: Dockerfile
+    volumes:
+      - ./scripts/nav2:/root/scripts/nav2
+      - ./docker/middleware_profiles:/usr/local/share/middleware_profiles
+      - ./nav2/zeta_navigation2:/root/ws/src/zeta_navigation2
+      - ./nav2/zeta_navigation2/params:/root/ws/install/zeta_navigation2/share/zeta_navigation2/params
+      - ./nav2/zeta_navigation2/launch:/root/ws/install/zeta_navigation2/share/zeta_navigation2/launch
+      - ./nav2/zeta_navigation2/behavior_trees:/root/ws/install/zeta_navigation2/share/zeta_navigation2/behavior_trees
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    command: pm2-runtime /root/scripts/nav2/nav2.json
+    tty: true
+    environment:
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
+      - DISPLAY=${DISPLAY}
+      - CYCLONEDDS_URI=/usr/local/share/middleware_profiles/cyclonedds.xml
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_KEY}
+      - TARGET_IPADDRESS=${TARGET_IPADDRESS}
+    network_mode: host
+    privileged: true
+    # develop:
+    #   watch:
+    #     - path: ./nav2
+    #       action: rebuild

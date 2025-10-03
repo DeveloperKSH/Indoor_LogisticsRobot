@@ -1,0 +1,23 @@
+{
+    "apps": [
+        {
+            "name": "zeta_navigation2",
+            "cwd": "/root/scripts/nav2",
+            "args": "",
+            "script": "zeta_navigation2.sh",
+            "exec_mode": "fork",
+            "exec_interpreter": "bash"
+        },
+        {
+            "name": "fsm_waypoint",
+            "cwd": "/root/scripts/nav2",
+            "args": "",
+            "script": "fsm_waypoint.sh",
+            "exec_mode": "fork",
+            "exec_interpreter": "bash",
+            "log_file": "/dev/null",
+            "out_file": "/dev/null",
+            "error_file": "/dev/null"
+        }
+    ]
+}
