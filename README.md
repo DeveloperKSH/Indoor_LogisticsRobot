@@ -8,7 +8,7 @@
 
 - **역할**: LiDAR **필터링** 및 Odom, IMU를 **융합**하여 안정적인 **맵 생성 → 로컬라이제이션 → 자율주행** 수행  
 - **구성**: `z8015`(모터 드라이버·센서·브링업), Cartographer/SLAM Toolbox, AMCL, robot_localization(EKF), Nav2(zeta_navigation2), FSM Waypoint, udev rules, Docker/PM2  
-- **활용**: 창고/사무동/학교 등 **실내 물류로봇**(저가형 하드웨어) 현장 투입 및 빠른 재현/확장
+- **활용**: 창고, 사무동, 학교 등 **실내 물류로봇**(저가형 하드웨어) 현장 투입 및 빠른 재현/확장
 
 ---
 
