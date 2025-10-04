@@ -67,20 +67,16 @@
 flowchart LR
   subgraph Sensors
     L["LiDAR"] -->|/scan| F1["LiDAR Filter"]
-    I["IMU"] -->|/imu/data| E["EKF (robot_localization)"]
+    I["IMU"] -->|/imu/data| E["EKF (Localization)"]
     M["Motor Driver"] -->|/odom| E
   end
 
-  F1 -->|/filtered_scan| S["SLAM / Cartographer|SLAM Toolbox"]
-  E -. "odom (motion prior)" .-> S
+  F1 -->|/filtered_scan| S["SLAM / AMCL"]
+  E -. "odom" .-> S
 
   %% TF responsibilities
   S -->|TF map→odom| N["Nav2"]
   E -->|TF odom→base_link| N
-
-  %% Costmap also uses scans
-  F1 -->|/filtered_scan| C["Nav2 Costmap (obstacle layer)"]
-  C --> N
 
   N -->|/cmd_vel| M
 
