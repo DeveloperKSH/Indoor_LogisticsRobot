@@ -34,7 +34,7 @@
   - **LiDAR** (`rplidar s3`) → `/scan` 발행, 맵 생성, 스캔 매칭, 장애물 갱신의 핵심 관측 입력을 제공
   - **LiDAR 필터** (`lidar_filter`) → 각도 구간별 min/max range로 필터링으로 노이즈 제거 → **`/filtered_scan`** 표준화
   - **조이스틱/수동 모드** → 초기 테스트, 도킹, 트러블 슈팅 시 수동 제어 제공
-  - **브링업 런치** (`z8015_mobile_bringup`) → EKF/TF/`twist_mux` 포함하여 상위 스택에 일관된 토픽/TF 공급
+  - **브링업 런치** (`z8015_mobile_bringup`) → `ekf`, `TF`, `twist_mux` 포함하여 상위 스택에 일관된 토픽/TF 공급
 
 - **위치 추정 (`robot_localization`, `ekf`)**  
   - Odom + IMU 융합으로 `map → odom → base_link` TF 체인 안정화
