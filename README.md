@@ -76,8 +76,7 @@ flowchart LR
   E -->|TF odom→base_link| N
 
   %% ★ cmd_vel 라벨을 중간 노드로 분리
-  N --> Q["/cmd_vel"]
-  Q --> M
+  N --> |cmd_vel| M
 
   subgraph Orchestration
     P["PM2"] -. "start / monitor / healthcheck" .-> B["Bringup / SLAM / Nav2"]
