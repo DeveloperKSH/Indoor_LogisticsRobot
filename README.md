@@ -67,18 +67,17 @@
 flowchart LR
   subgraph Sensors
     L["LiDAR"] -->|/scan| F1["LiDAR Filter"]
-    I["IMU"] -->|/imu/data| E["EKF (Localization)"]
+    I["IMU"] -->|/imu/data| E["EKF (robot_localization)"]
     M["Motor Driver"] -->|/odom| E
   end
 
   F1 -->|/filtered_scan| S["SLAM / AMCL"]
-  E -. "odom" .-> S
-
-  %% TF responsibilities
   S -->|TF map→odom| N["Nav2"]
   E -->|TF odom→base_link| N
 
-  N -->|/cmd_vel| M
+  %% ★ cmd_vel 라벨을 중간 노드로 분리
+  N --> Q["/cmd_vel"]
+  Q --> M
 
   subgraph Orchestration
     P["PM2"] -. "start / monitor / healthcheck" .-> B["Bringup / SLAM / Nav2"]
