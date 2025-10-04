@@ -71,10 +71,16 @@ flowchart LR
     M["Motor Driver"] -->|/odom| E
   end
 
-  F1 -->|/filtered_scan| S["SLAM / AMCL"]
-  %% TF 분리 표기: AMCL -> map→odom, EKF -> odom→base_link
+  F1 -->|/filtered_scan| S["SLAM / Cartographer|SLAM Toolbox"]
+  E -. "odom (motion prior)" .-> S
+
+  %% TF responsibilities
   S -->|TF map→odom| N["Nav2"]
   E -->|TF odom→base_link| N
+
+  %% Costmap also uses scans
+  F1 -->|/filtered_scan| C["Nav2 Costmap (obstacle layer)"]
+  C --> N
 
   N -->|/cmd_vel| M
 
