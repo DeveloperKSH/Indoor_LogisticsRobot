@@ -95,6 +95,7 @@ flowchart LR
 실행 전에 **USB 디바이스 경로를 고정**해 주세요. (재부팅·포트 변경에도 `/dev/*`가 일정)
 
 ```bash
+# 1) 단일 장치 기본 규칙
 # 아래 예시는 WT901(IMU), ZLAC8015D(드라이버), RPLIDAR S3를
 # 각각 `/dev/imu`, `/dev/driver`, `/dev/rplidar`로 고정합니다.
 
@@ -109,4 +110,55 @@ SUBSYSTEM=="tty", KERNEL=="ttyUSB*", ATTRS{idVendor}=="0403", ATTRS{idProduct}==
 # /etc/udev/rules.d/99-rplidar.rules
 SUBSYSTEM=="tty", KERNEL=="ttyUSB*", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", \
   SYMLINK+="rplidar", GROUP="dialout", MODE="0666"
+
+# 2) 동일 VID:PID 장치 2대 구분(시리얼 기반)
+# 같은 칩셋(예: FTDI 0403:6001) 2대를 서로 다른 링크로 고정합니다.
+# lsusb -d 0403:6001 -v | grep -i serial 결과를 사용해 ATTRS{serial}을 지정하세요.
+
+# /etc/udev/rules.d/99-driver.rules  (예: 시리얼 A74XSC8M / A75BR3OF)
+SUBSYSTEM=="tty", KERNEL=="ttyUSB*", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", \
+  ATTRS{serial}=="A74XSC8M", SYMLINK+="driver0", GROUP="dialout", MODE="0666"
+
+SUBSYSTEM=="tty", KERNEL=="ttyUSB*", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", \
+  ATTRS{serial}=="A75BR3OF", SYMLINK+="driver1", GROUP="dialout", MODE="0666"
+
+# 3) 적용 & 확인
+sudo udevadm control --reload-rules && sudo udevadm trigger
+ls -l /dev/imu /dev/driver /dev/rplidar  # 또는 /dev/driver0 /dev/driver1
+```
+
+---
+
+### 🧱 (2) 이미지 빌드
+
+이제 컨테이너 이미지를 빌드합니다.  
+
+서비스별로 나눠 빌드할 수 있으며, 최초 1회만 실행하면 됩니다.
+
+```bash
+docker compose build bringup
+docker compose build slam
+docker compose build nav2
+```
+
+---
+
+### 🚀 (3) 실행
+
+필요한 서비스만 지정하여 실행할 수 있습니다.  
+
+여기서는 `bringup`, `slam`, `nav2` 세 서비스를 함께 실행합니다.  
+
+```bash
+# 1) Bringup
+docker compose up -d bringup
+docker compose logs -f bringup
+
+# 2) SLAM
+docker compose up -d slam
+docker compose logs -f slam
+
+# 3) Nav2
+docker compose up -d nav2
+docker compose logs -f nav2
 ```
