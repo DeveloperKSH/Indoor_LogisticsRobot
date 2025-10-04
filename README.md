@@ -32,7 +32,7 @@
   - **모터 드라이버** (`ZLAC8015D`, RS-485) → `cmd_vel` 변환, 속도/가속 한계 적용, 통신 예외 재시도
   - **IMU** (`wt901`) → `sensor_msgs/Imu` 발행, EKF에 yaw 안정성 제공
   - **LiDAR** (`rplidar s3`) → `/scan` 발행, 맵 생성, 스캔 매칭, 장애물 갱신의 핵심 관측 입력을 제공
-  - **LiDAR 필터** (`lidar_filter`) → 각도 구간별 min/max range로 근접 반사·차체 간섭 제거 → **`/filtered_scan`** 표준화
+  - **LiDAR 필터** (`lidar_filter`) → 각도 구간별 min/max range로 필터링으로 노이즈 제거 → **`/filtered_scan`** 표준화
   - **조이스틱/수동 모드** → 초기 셋업·비상 운용 경로 제공
   - **브링업 런치** (`z8015_mobile_bringup`) → EKF/TF/`twist_mux` 포함하여 상위 스택에 일관된 토픽/TF 공급
 
