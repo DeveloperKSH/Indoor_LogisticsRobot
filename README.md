@@ -33,7 +33,7 @@
   - **IMU** (`wt901`) → `sensor_msgs/Imu` 발행, EKF에 yaw 안정성 제공
   - **LiDAR** (`rplidar s3`) → `/scan` 발행, 맵 생성, 스캔 매칭, 장애물 갱신의 핵심 관측 입력을 제공
   - **LiDAR 필터** (`lidar_filter`) → 각도 구간별 min/max range로 필터링으로 노이즈 제거 → **`/filtered_scan`** 표준화
-  - **조이스틱/수동 모드** → 초기 셋업·비상 운용 경로 제공
+  - **조이스틱/수동 모드** → 초기 테스트, 도킹, 트러블 슈팅 시 수동 제어 제공
   - **브링업 런치** (`z8015_mobile_bringup`) → EKF/TF/`twist_mux` 포함하여 상위 스택에 일관된 토픽/TF 공급
 
 - **위치 추정 (`robot_localization`, `ekf`)**  
@@ -54,9 +54,9 @@
 - **Docker 환경**  
   - 전체 시스템을 컨테이너로 패키징하여 손쉽게 실행 및 배포 가능
 
-- **(권장) Safety 레이어**  
-  초음파/IR → `twist_mux` **lock** 연계(E-Stop)  
-  180° 보완을 위해 **후진 제한/감속** 및 **회전 후 전진** 패턴
+- **Safety 레이어**  
+  **(적용)** `twist_mux` **긴급 채널/락** 구조( `emergency/cmd_vel`, `pause_navigation` 등 )  
+  **(적용 예정)** 초음파/IR/범퍼 → `/safety/stop` → **lock(E-Stop)** 연동, 180° FOV 보완(후진 제한/감속, 회전 후 전진)
 
 ---
 
