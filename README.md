@@ -41,23 +41,25 @@
   - Odom + IMU 융합으로 `map → odom → base_link` TF 체인 안정화
 
 - **SLAM (`Cartographer` / `SLAM Toolbox`)**  
-  - 실내 맵 생성(맵핑 모드) 및 loop-closure, Localization 모드에서 **AMCL**로 위치 추정
+  - 실내 맵 생성(맵핑 모드) 및 loop-closure, Localization 모드에서 AMCL로 위치 추정
 
 - **주행 스택 (`nav2`, `zeta_navigation2`)**  
   - Planner/Controller/BT 플러그인 기반 운영 최적화
 
 - **상태 기계 (`fsm_waypoint`)**  
-  - 주행 취소/정지/변경/재개를 제어하여 주행 사이클 안정화 및 텔레메트리 발행
+  - 주행 취소/정지/변경/재개를 제어하여 주행 사이클 안정화
+  - 문제 상황 발생 시 정지, 상황 해소 시 재주행 관리
+  - 주행/악세서리 텔레메트리 데이터 발행
 
 - **운영 자동화 & 프로세스 감시 (`scripts/*`, `pm2`)**  
-  - USB 고정 symlink(udev), **헬스체크 기반 순차 실행(fail-fast)**, **프로세스 감시 및 자동 재시작**, 로그 롤링
+  - USB 고정 symlink(udev), 헬스체크 기반 순차 실행(fail-fast), 프로세스 감시 및 자동 재시작, 로그 롤링
 
 - **Docker 환경**  
   - 전체 시스템을 컨테이너로 패키징하여 손쉽게 실행 및 배포 가능
 
 - **Safety 레이어**  
-  **(적용)** `twist_mux` **긴급 채널/락** 구조( `emergency/cmd_vel`, `pause_navigation` 등 )  
-  **(적용 예정)** 초음파/IR/범퍼 → `/safety/stop` → **lock(E-Stop)** 연동, 180° FOV 보완(후진 제한/감속, 회전 후 전진)
+  **(적용)** `twist_mux` 긴급 채널/락 구조( `emergency/cmd_vel`, `pause_navigation` 등 )  
+  **(적용 예정)** 초음파/IR/범퍼 → `/safety/stop` → lock(E-Stop) 연동, 180° FOV 보완(후진 제한/감속, 회전 후 전진)
 
 ---
 
