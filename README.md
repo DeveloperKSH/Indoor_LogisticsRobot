@@ -44,10 +44,10 @@
   - 실내 맵 생성(맵핑 모드) 및 loop-closure, Localization 모드에서 **AMCL**로 위치 추정
 
 - **주행 스택 (`nav2`, `zeta_navigation2`)**  
-  - Planner/Controller/Recovery/BT 플러그인 기반 운영 최적화
+  - Planner/Controller/BT 플러그인 기반 운영 최적화
 
 - **상태 기계 (`fsm_waypoint`)**  
-  - Bringup/경로/재경로/장애/리커버리를 제어하는 **상태 기계**로 주행 사이클 제어 및 텔레메트리 발행
+  - 주행 취소/정지/변경/재개를 제어하는 **상태 기계**로 주행 사이클 제어 및 텔레메트리 발행
 
 - **운영 자동화 & 프로세스 감시 (`scripts/*`, `pm2`)**  
   - USB 고정 symlink(udev), **헬스체크 기반 순차 실행(fail-fast)**, **프로세스 감시 및 자동 재시작**, 로그 롤링
